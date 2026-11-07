@@ -105,6 +105,7 @@ ThreadPool::~ThreadPool()
     // 等待全部工作线程退出
     for (pthread_t tid : threadIDs)
     {
+        std::cout << "thread " << std::to_string(pthread_self()) << " is ending" << std::endl;
         pthread_join(tid, nullptr);
     }
 
