@@ -36,3 +36,11 @@ Task TaskQueue::takeTask()
 	pthread_mutex_unlock(&m_mutex);
 	return t;
 }
+
+size_t TaskQueue::taskNumber()
+{
+	pthread_mutex_lock(&m_mutex);
+	size_t size = m_taskQ.size();
+	pthread_mutex_unlock(&m_mutex);
+	return size;
+}

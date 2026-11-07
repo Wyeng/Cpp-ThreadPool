@@ -32,11 +32,7 @@ public:
 	// 取出一个任务
 	Task takeTask();
 	// 获取当前任务个数
-	inline int taskNumber()
-	{
-		return m_taskQ.size();
-	}
-
+	size_t taskNumber();
 private:
 	pthread_mutex_t m_mutex;
 	std::queue<Task> m_taskQ;

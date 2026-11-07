@@ -1,4 +1,6 @@
+#pragma once
 #include"TaskQueue.h"
+#include<vector>
 class ThreadPool
 {
 private:
@@ -6,7 +8,7 @@ private:
 	TaskQueue* taskQ;
 
 	pthread_t managerID;	// 管理者线程ID
-	pthread_t* threadIDs;	// 工作的线程ID
+	std::vector<pthread_t> threadIDs;	// 使用vector来存放工作的线程ID，方便管理
 	int minNum;				// 最小线程数
 	int maxNum;				// 最大线程数
 	int busyNum;			// 忙的线程数
@@ -15,12 +17,14 @@ private:
 
 	pthread_mutex_t mutexPool;	// 锁整个线程池
 	pthread_cond_t notEmpty;	// 任务队列是否为空
+	static const int NUMBER = 2;
 
 	bool shutdown;	// 是否销毁线程池
+	bool managerStarted;	// 管理者线程是否工作
 
 public:
 	// 构造函数
-	ThreadPool(int min,int max);
+	ThreadPool(int min, int max);
 	// 析构函数
 	~ThreadPool();
 
@@ -33,11 +37,12 @@ public:
 	// 获取线程池中活着的线程个数
 	int getAliveNum();
 
+	ThreadPool(const ThreadPool&) = delete;
+	ThreadPool& operator=(const ThreadPool&) = delete;
+
 private:
 	// 工作线程的任务函数
 	static void* worker(void* arg);
 	// 管理者线程任务函数
 	static void* manager(void* arg);
-	// 单个线程退出
-	void threadExit();
 };
