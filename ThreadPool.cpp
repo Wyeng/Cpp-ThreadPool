@@ -21,7 +21,7 @@ ThreadPool::ThreadPool(int min, int max)
     {
         throw std::invalid_argument("Invalid thread count");
     }
-
+    // 申请内存
     taskQ = new TaskQueue;
 
     if (pthread_mutex_init(&mutexPool, nullptr) != 0)
@@ -42,7 +42,7 @@ ThreadPool::ThreadPool(int min, int max)
         // 提前分配内存大小
         threadIDs.reserve(maxNum);
 
-        // 创建初始工作线程
+        // 按照最小线程数大小创建初始工作线程
         for (int i = 0; i < minNum; ++i)
         {
             pthread_t tid;
@@ -61,11 +61,12 @@ ThreadPool::ThreadPool(int min, int max)
         {
             throw std::runtime_error("manager create failed");
         }
-
+        // 初始化管理者线程开始标志
         managerStarted = true;
     }
     catch (...)
     {
+        // 异常处理
         pthread_mutex_lock(&mutexPool);
         shutdown = true;
         pthread_cond_broadcast(&notEmpty);
@@ -92,6 +93,7 @@ ThreadPool::~ThreadPool()
     shutdown = true;
     exitNum = 0;
 
+    // 唤醒阻塞的工作线程
     pthread_cond_broadcast(&notEmpty);
 
     pthread_mutex_unlock(&mutexPool);
@@ -109,6 +111,7 @@ ThreadPool::~ThreadPool()
         pthread_join(tid, nullptr);
     }
 
+    // 清除申请的内存
     delete taskQ;
 
     pthread_cond_destroy(&notEmpty);
